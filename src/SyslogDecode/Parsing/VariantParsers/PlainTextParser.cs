@@ -15,7 +15,7 @@ namespace SyslogDecode.Parsing
             ctx.SkipSpaces();
             ctx.ParsedMessage.PayloadType = Model.PayloadType.PlainText; 
             ctx.ParsedMessage.Message = ctx.Text.Substring(ctx.Position);
-            ctx.ParsedMessage.Header.Timestamp = DateTime.UtcNow; 
+            ctx.ParsedMessage.Header.Timestamp = DateTimeOffset.UtcNow; 
             return true; 
         }
     }

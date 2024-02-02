@@ -48,13 +48,13 @@ namespace SyslogDecode.Model
             Header = new SyslogHeader(); 
         }
 
-        public ParsedSyslogMessage(Facility facility, Severity severity, DateTime? timestamp = null, string hostName = null,
+        public ParsedSyslogMessage(Facility facility, Severity severity, DateTimeOffset? timestamp = null, string hostName = null,
                            string appName = null, string procId = null, string msgId = null, string message = null)
         {
             PayloadType = PayloadType.Rfc5424;
             Facility = facility;
             Severity = severity;
-            timestamp = timestamp ?? DateTime.UtcNow;
+            timestamp = timestamp ?? DateTimeOffset.UtcNow;
             Header = new SyslogHeader()
             {
                 Timestamp = timestamp,
@@ -70,7 +70,7 @@ namespace SyslogDecode.Model
 
     public class SyslogHeader
     {
-        public DateTime? Timestamp; 
+        public DateTimeOffset? Timestamp; 
         public string HostName;
         public string AppName;
         public string ProcId;

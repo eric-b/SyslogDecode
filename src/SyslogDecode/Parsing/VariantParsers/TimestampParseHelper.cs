@@ -62,7 +62,7 @@ namespace SyslogDecode.Parsing
 
         }
 
-        public static DateTime? ParseStandardTimestamp(this ParserContext ctx)
+        public static DateTimeOffset? ParseStandardTimestamp(this ParserContext ctx)
         {
             var ts = ctx.ReadWord();
             if (ts == null)
@@ -70,13 +70,12 @@ namespace SyslogDecode.Parsing
                 return null;
             }
 
-            if (DateTime.TryParse(ts, out var dt))
+            if (DateTimeOffset.TryParse(ts, out var dt))
             {
-                // by default TryParse produces local time
-                return dt.ToUniversalTime();
+                return dt;
             }
             ctx.AddError($"Invalid timestamp '{ts}'.");
-            return DateTime.MinValue;
+            return DateTimeOffset.MinValue;
         }
 
 
@@ -87,7 +86,10 @@ namespace SyslogDecode.Parsing
         {
             var year = DateTime.UtcNow.Year;
             var savePos = ctx.Position;
-            if (ctx.Match($"{year}-") || ctx.Match($"{year - 1}-")) //(also check prior year)
+            if (ctx.Match($"{year}-") ||
+                //(also check prior and next years)
+                ctx.Match($"{year - 1}-") || 
+                ctx.Match($"{year + 1}-")) 
             {
                 ctx.Position = savePos;
                 var spPos = ctx.Text.IndexOf(" ", ctx.Position);// 
@@ -95,9 +97,9 @@ namespace SyslogDecode.Parsing
                 {
                     var dtStr = ctx.Text.Substring(ctx.Position, spPos - ctx.Position);
                     ctx.Position = spPos;
-                    if (DateTime.TryParse(dtStr, out var dt))
+                    if (DateTimeOffset.TryParse(dtStr, out var dt))
                     {
-                        ctx.ParsedMessage.Header.Timestamp = dt.ToUniversalTime();
+                        ctx.ParsedMessage.Header.Timestamp = dt;
                         return true;
                     }
                 }
@@ -126,6 +128,7 @@ namespace SyslogDecode.Parsing
             var y = DateTime.UtcNow.Year;
             var thisYear = y.ToString();
             var prevYear = (y - 1).ToString();
+            var nextYear = (y + 1).ToString();
             string lastWord = null;
             // Take first 5 words and try to understand what it is
             for (int i = 0; i < 5; i++)
@@ -133,11 +136,11 @@ namespace SyslogDecode.Parsing
                 if (i >= words.Length)
                     break;
                 var word = words[i];
-                if (word == thisYear || word == prevYear)
+                if (word == thisYear || word == prevYear || word == nextYear)
                     year = word;
                 else if (word.Length == 3 && _months.Contains(word.ToUpperInvariant()))
                     month = word;
-                else if (word.Length < 3 && int.TryParse(word, out var iDay))
+                else if (word.Length < 3 && int.TryParse(word, out _))
                 {
                     day = word;
                 }
@@ -219,13 +222,17 @@ namespace SyslogDecode.Parsing
         //  <186>: 2020 Mar  4 17:20:54.183 UTC:
         private static bool TryParseIfStartsWithColonThenYear(ParserContext ctx)
         {
-            var year = DateTime.UtcNow.Year;
+            var year = DateTimeOffset.UtcNow.Year;
             var savePos = ctx.Position;
-            if (ctx.Match(": ") && (ctx.Match($"{year}") || ctx.Match($"{year - 1}"))) //check prior year
+            if (ctx.Match(": ") && 
+                (ctx.Match($"{year}") ||
+                 //check prior and next years
+                 ctx.Match($"{year - 1}") ||
+                 ctx.Match($"{year + 1}"))) 
             {
                 // we already matched beyond year; move back: 
                 ctx.Position = savePos + ": ".Length;
-                var UTC = "PST:"; // "UTC:";
+                var UTC = "PST:"; // "UTC:"; // TODO: a bug? Seems to support only Pacific Time Zone. We probably should use proper DateTimeOffset parsing method (or NodaTime ?). Requires tests.
                 var utcPos = ctx.Text.IndexOf(UTC, ctx.Position);
                 if (utcPos > 0)
                 {
@@ -260,10 +267,10 @@ namespace SyslogDecode.Parsing
                     var dtStr = ctx.Text.Substring(ctx.Position, spPos - ctx.Position);
                     ctx.Position = spPos + 1;
                     ctx.Match("GMT"); //skip also GMT
-                    if (DateTime.TryParse(dtStr, out var dt) ||
-                        DateTime.TryParseExact(dtStr, "MM/dd/yyyy:HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dt))
+                    if (DateTimeOffset.TryParse(dtStr, out var dt) ||
+                        DateTimeOffset.TryParseExact(dtStr, "MM/dd/yyyy:HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dt))
                     {
-                        ctx.ParsedMessage.Header.Timestamp = dt.ToUniversalTime();
+                        ctx.ParsedMessage.Header.Timestamp = dt;
                     }
                 }
                 return true;

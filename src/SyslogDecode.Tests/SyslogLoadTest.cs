@@ -95,7 +95,7 @@ namespace SyslogDecode.Tests
             var client = new SyslogUdpSender("127.0.0.1");
             for (int i = 0; i < itemCount; i++)
             {
-                var entry = new ParsedSyslogMessage(Facility.Authorization, Severity.Alert, DateTime.UtcNow, "Local", "TestApp", "ProcId" + procNum, "Msg" + i, 
+                var entry = new ParsedSyslogMessage(Facility.Authorization, Severity.Alert, DateTimeOffset.UtcNow, "Local", "TestApp", "ProcId" + procNum, "Msg" + i, 
                                "Something happened here at " + DateTime.Now);
                 var prmList = new List<NameValuePair>();
                 var elemName = "MainElem";

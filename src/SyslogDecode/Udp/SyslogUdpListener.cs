@@ -90,7 +90,7 @@ namespace SyslogDecode.Udp
                 {
                     var bytes = PortListener.Receive(ref remoteIp);
                     var message = Encoding.UTF8.GetString(bytes); // See notes on encoding at the end of this file
-                    var msg = new RawSyslogMessage() { ReceivedOn = DateTime.UtcNow, SourceIpAddress = remoteIp.Address, Message = message };
+                    var msg = new RawSyslogMessage() { ReceivedOn = DateTimeOffset.UtcNow, SourceIpAddress = remoteIp.Address, Message = message };
                     Interlocked.Increment(ref _packetCount);
                     InputEpsCounter.Add(1); 
                     Broadcast(msg);

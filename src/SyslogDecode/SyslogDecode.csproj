@@ -9,8 +9,8 @@
     <Description>Syslog client (sender), server (listener) components.</Description>
     <Copyright>Microsoft</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageVersion>1.3.0</PackageVersion>
-    <Version>1.3.0</Version>
+    <PackageVersion>1.3.0.1</PackageVersion>
+    <Version>1.3.0.1</Version>
     <Authors>Microsoft MSRC</Authors>
     <Company>Microsoft</Company>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

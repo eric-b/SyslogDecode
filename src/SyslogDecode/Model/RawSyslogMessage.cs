@@ -13,7 +13,7 @@ namespace SyslogDecode.Model
     public class RawSyslogMessage
     {
         /// <summary>Date-time when the message was received. </summary>
-        public DateTime ReceivedOn;
+        public DateTimeOffset ReceivedOn;
 
         /// <summary>The IP address of the message sender. </summary>
         public IPAddress SourceIpAddress;

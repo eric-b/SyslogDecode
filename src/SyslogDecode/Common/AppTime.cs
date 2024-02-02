@@ -13,7 +13,7 @@ namespace SyslogDecode.Common
     ///     A static utility class implementing the access to Now and UtcNow date/time system functions.
     /// </summary>
     /// <remarks>
-    ///     The class provides wrappers around the <see cref="DateTime.UtcNow"/> and <see cref="DateTime.Now"/>
+    ///     The class provides wrappers around the <see cref="DateTime.UtcNow"/> and <see cref="DateTimeOffset.Now"/>
     ///     properties. The goal of the wrappers is to be able to shift/offset the current time
     ///     value in unit tests, when testing the time-dependent features, like data expiration.
     /// </remarks>
@@ -40,11 +40,11 @@ namespace SyslogDecode.Common
         ///     computer, expressed as the local time.
         ///     The returned value can be shifted by the unit testing code.
         /// </summary>
-        public static DateTime Now
+        public static DateTimeOffset Now
         {
             get
             {
-                var now = DateTime.Now;
+                var now = DateTimeOffset.Now;
                 return (_offset == TimeSpan.Zero) ? now : now.Add(_offset);
             }
         }
